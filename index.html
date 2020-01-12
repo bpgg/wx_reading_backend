@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>测试接口</title>
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+  <form id="login_value">
+    <div>
+        <label>用户id：</label>
+        <input id="username" type="text" name="user_id" placeholder="请输入用户名" value="1">
+    </div>
+    <div>
+        <label>密  码：</label>
+        <input id="passwd" type="password" name="password" placeholder="请输入密码" value="123">
+    </div>
+    <div>
+        <input type="button" value="登陆" onclick="login()">
+        <input type="reset" value="重置">
+    </div>
+
+</form>
+
+  <script>
+    function login(){
+      //  console.log(123)
+      //  debugger
+        $.ajax({
+          // url: 'http://127.0.0.1:3000/user/login',
+          url: 'http://127.0.0.1:3000/user/register',
+          type: 'post',
+          // 设置的是请求参数
+          data: $('#login_value').serialize(),
+          // 用于设置响应体的类型 注意 跟 data 参数没关系！！！
+          dataType: 'json',
+          success: function (res) {
+            // 一旦设置的 dataType 选项，就不再关心 服务端 响应的 Content-Type 了
+            // 客户端会主观认为服务端返回的就是 JSON 格式的字符串
+            console.log(res);
+            console.log(456)
+          },
+          fail:function(res){
+            console.log(res);
+            console.log(123)
+          }
+          
+        })
+      
+      
+    }
+   
+  </script>
+</body>
+</html>

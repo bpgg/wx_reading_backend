@@ -1,0 +1,9 @@
+{
+  "presets": [
+    "latest",
+    "env"
+  ],
+  "plugins": [],
+  "sourceMaps": true,
+  "retainLines": true
+}
