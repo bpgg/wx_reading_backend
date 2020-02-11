@@ -9,7 +9,7 @@ var db_book = {
   getBooks:async()=>{
     const data = await db.exec(db.sql
       .table('book')
-      .field('book_id,book_name,author,book_grade,book_coverImage,book_tip')
+      .field('book_id,book_name,author,book_grade,book_coverImage,book_tip,book_chapterID')
       .limit(10)
       .select())
       return data
@@ -17,7 +17,7 @@ var db_book = {
   getBooksByCategory:async(category)=>{
     const data = await db.exec(db.sql
       .table('book')
-      .field('book_id,book_name,author,book_grade,book_coverImage')
+      .field('book_id,book_chapterID,book_name,author,book_grade,book_coverImage')
       .where({category:category})
       .limit(3)
       .select())

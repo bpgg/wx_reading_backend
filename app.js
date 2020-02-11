@@ -1,7 +1,7 @@
 import config from './config';
-import router from './routes/index.js';
 import session from 'express-session';
 import express from 'express';
+import router from './routes/index.js';
 import db from './mysql/db'
 
 const app = express()
@@ -37,6 +37,8 @@ router(app);
 
 
 app.use(express.static('./public'));
+app.use(express.static('./upload'));
+
 app.listen(config.port, () => {
 	console.log(`成功监听端口：${config.port}`)
 });

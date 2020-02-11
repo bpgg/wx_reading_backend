@@ -90,10 +90,40 @@ var db_user = {
       .select())
       return !!res[0]
   },
+  wx_getStoryShelf:async(openid)=>{
+    const res = await db.exec(db.sql
+      .table('storyShelf')
+      .where({openid:openid})
+      .select())
+      return res
+  },
   wx_searchStoreBookByKeyword:async(keyword)=>{
 
+  },
+  wx_updateAvatar:async(openid,avatarUrl)=>{
+    const res = await db.exec(db.sql
+      .table('wx_user')
+      .data({avatarUrl:avatarUrl})
+      .where({openid:openid})
+      .update())
+      return res
+  },
+  wx_getUserInfo:async(openid)=>{
+    const res = await db.exec(db.sql
+      .table('wx_user')
+      .where({openid:openid})
+      .select())
+      return res[0]
+  },
+  wx_updateUserInfo:async(openid,userInfo)=>{
+    console.log(userInfo)
+    const res = await db.exec(db.sql
+      .table('wx_user')
+      .data({gender:userInfo.gender,nickName:userInfo.nickName})
+      .where({openid:openid})
+      .update())
+      return res[0]
   }
-
 
 
 

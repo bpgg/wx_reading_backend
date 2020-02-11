@@ -1,6 +1,10 @@
 import db_user from '../../dao/user/user'
 var crypto = require('crypto')
 import formidable from 'formidable'
+import db from '../../mysql/db'
+var path = require("path")
+var fs = require("fs")
+
 const request = require('request')
 
 const appid = "wxda7c6c9805840a1a"
@@ -122,13 +126,67 @@ class User{
 				message: '退出失败'
 			})
 		}
-  }
+	}
+	async updateAvatar2(req, res, next){
+		console.log('123')
+	}
   
   async updateAvatar(req, res, next){
+		var form = new formidable.IncomingForm();//既处理表单，又处理文件上传
+    //设置文件上传文件夹/路径，__dirname是一个常量，为当前路径
+    let uploadDir = path.join(__dirname, "../../upload/");
+    form.uploadDir = uploadDir;//本地文件夹目录路径
+
+    form.parse(req, (err, fields, files) => {
+				
+				let {openid} = fields
+				console.log(files.file)
+        let oldPath = files.file.path;//这里的路径是图片的本地路径
+        console.log(files.file.name)//图片传过来的名字
+        let newPath = path.join(path.dirname(oldPath), files.file.name);
+        //这里我传回一个下载此图片的Url
+				// var downUrl = "http://localhost:" + 3000 + "/upload/" + files.file.name;//
+				var downUrl = "http://localhost:" + 3000 + "/" + files.file.name;//
+				db_user.wx_updateAvatar(openid,downUrl)
+        fs.rename(oldPath, newPath, () => {//fs.rename重命名图片名称
+            res.json({ downUrl: downUrl })
+        })
+    })
+		// res.send({
+		// 	status: 1,
+		// 	success: '更新头像成功'
+		// })
+	}
+	async wx_getStoryShelf(req,res){
+		var openid = req.query.openid
+		var storys = await db_user.wx_getStoryShelf(openid)
 		res.send({
-			status: 1,
-			success: '更新头像成功'
+			data:storys
 		})
+	}
+	async wx_getUserInfo(req,res){
+		var openid = req.query.openid
+		var user = await db_user.wx_getUserInfo(openid)
+		res.send({
+			data:user
+		})
+	}
+	async wx_updateUserInfo(req,res){
+		const form = new formidable.IncomingForm();
+		form.parse(req, async (err, fields, files) => {
+			let {openid,nickName,gender} = await fields;
+			gender = (gender=='男')?1:0;
+			let userInfo = {
+				gender:gender,
+				nickName:nickName
+			}
+			var user = await db_user.wx_updateUserInfo(openid,userInfo)
+			res.send({
+				data:user
+			})
+		})
+		
+		
 	}
 	async getUserInfo(req,res){
 		var user_id = req.query.user_id
@@ -159,15 +217,15 @@ class User{
 				const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${appsecret}&js_code=${code}&grant_type=authorization_code`
 				request(url, async(err,res,body)=>{
 
-					console.log(JSON.parse(body));
-					let {openid} = JSON.parse(body)
-					console.log('openid',openid)
+					body = JSON.parse(body);
+					let {openid,session_key} = body;
+					console.log('openid',openid);
+					console.log('session_key',session_key)
 					// 根据openid判断是否已经存在数据库，不存在则生成wx_user存进数据
 					const flag = await db_user.wx_hasUser(openid)
 					
 					if(!flag){
 						await db_user.wx_saveUser(userInfo,openid)
-						
 					}
 					res2.send({
 						data:body
@@ -207,6 +265,8 @@ class User{
 			hasAdd:data
 		})
 	}
+
+
 }
 
 export default new User()
